@@ -1,0 +1,73 @@
+apiVersion: v1
+kind: Template
+metadata:
+  name: mlflow-job-executor
+  annotations:
+    description: "MLFlow Job Runner is used to run a machine learning job"
+    iconClass: "icon-redis"
+    tags: "mlflow,ai,coe"
+objects:
+- apiVersion: batch/v1
+  kind: Job
+  metadata:
+    name: ${MLFLOW_JOB_NAME}
+    app: mlflow-run
+    version: v0.2.1
+  spec:
+    template:
+      spec:
+        containers:
+        - name: "mlflow-run"
+          image: "quay.io/zmhassan/mlflow-run:0.2.1"
+          env:
+          - name: MLFLOW_TRACKING_URI
+            value: "${MLFLOW_TRACKING_URI}"
+          - name: MLFLOW_GIT_REPO
+            value: "${MLFLOW_GIT_REPO}"
+          - name: MLFLOW_ARGS
+            value: "${MLFLOW_ARGS}"
+          - name: GIT_COMMITTER_NAME
+            value: "${GIT_COMMITTER_NAME}"
+          - name: GIT_COMMITTER_EMAIL
+            value: "${GIT_COMMITTER_EMAIL}"
+          - name: CONDA_PKGS_DIRS
+            value: "/tmp/.conda/pkgs"
+          - name: AWS_SHARED_CREDENTIALS_FILE
+            value: "/root/.aws"
+          volumeMounts:
+            - mountPath: /root/.aws/
+              name: aws-credentials-2o0k5
+              readOnly: true
+        volumes:
+          - configMap:
+              defaultMode: 420
+              name: aws-credentials
+            name: aws-credentials-2o0k5
+        restartPolicy: Never
+  backoffLimit: 4
+
+
+parameters:
+- name: MLFLOW_TRACKING_URI
+  description: "Tracking server for accessing mlflow"
+  value: "http://mlflow-server-svc-dh-prod-mlflow.cloud.datahub.upshift.redhat.com"
+- name: MLFLOW_GIT_REPO
+  description: "machine learning git repo"
+  value: "https://github.com/databricks/mlflow-example.git"
+- name: MLFLOW_ARGS
+  description: "machine learning app arguments"
+  value:  "alpha=5"
+- name: GIT_COMMITTER_NAME
+  description: "The git username"
+  value: "zak.hassan"
+- name: GIT_COMMITTER_EMAIL
+  description: "Git user email"
+  value: "zak.hassan1010@gmail.com"
+- name: MLFLOW_VERSION
+  description: "version of MLFlow"
+  value: "0.2.1"
+- name: MLFLOW_JOB_NAME
+  description: "MLFlow Job Name"
+  value: "mlflow-run-v0.2.1"
+
+

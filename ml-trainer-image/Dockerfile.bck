@@ -12,8 +12,8 @@ RUN yum install -y bzip2 wget git \
 && mkdir /.conda  \
 && chown -Rv root /.conda \
 && chmod -R ug+rwx /.conda \
-&& bash Miniconda3-latest-Linux-x86_64.sh -b -p /tmp/conda 
-
+&& bash Miniconda3-latest-Linux-x86_64.sh -b -p /opt/conda \
+&& chown -Rv root /opt/conda/ 
 
 ENV PATH="/opt/conda/bin:${PATH}"
 COPY entrypoint.sh /etc/entrypoint.sh

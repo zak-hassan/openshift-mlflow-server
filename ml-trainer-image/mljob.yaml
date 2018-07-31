@@ -1,0 +1,35 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: mlflow-run-v0.2.1
+  app: mlflow-run
+  version: v0.2.1
+spec:
+  template:
+    spec:
+      containers:
+      - name: "mlflow-run"
+        image: "quay.io/zmhassan/mlflow-run:0.2.1"
+        env:
+        - name: MLFLOW_TRACKING_URI
+          value: "http://mlflow-server.10.15.17.38.xip.io"
+        - name: MLFLOW_GIT_REPO
+          value: "https://github.com/databricks/mlflow-example.git"
+        - name: MLFLOW_ARGS
+          value: "alpha=5"
+        - name: GIT_COMMITTER_NAME
+          value: "zak.hassan"
+        - name: GIT_COMMITTER_EMAIL
+          value: "zak.hassan1010@gmail.com"
+        volumeMounts:
+          - mountPath: /root/.aws/
+            name: aws-credentials-2o0k5
+            readOnly: true
+      volumes:
+        - configMap:
+            defaultMode: 420
+            name: aws-credentials
+          name: aws-credentials-2o0k5
+      restartPolicy: Never
+  backoffLimit: 4
+
